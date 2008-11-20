@@ -83,5 +83,15 @@ module Integrity
         builds.destroy!
         Builder.new(self).delete_code
       end
+      
+      def send_notifications
+        notifiers.each do |notifier|
+          begin
+            notifier.notify_of_build last_build
+          rescue Timeout::Error
+            next
+          end
+        end
+      end
   end
 end
