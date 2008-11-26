@@ -9,7 +9,6 @@ module Integrity
     property :branch,     String,   :nullable => false, :default => "master"
     property :command,    String,   :nullable => false, :length => 255, :default => "rake"
     property :public,     Boolean,  :default => true
-    property :building,   Boolean,  :default => false
     property :created_at, DateTime
     property :updated_at, DateTime
 
@@ -21,17 +20,18 @@ module Integrity
 
     validates_is_unique :name
 
-    def build(commit_identifier="HEAD")
-      return if building?
-      update_attributes(:building => true)
-      Thread.new(self) do |project|
-        begin
-          Builder.new(project).build(commit_identifier)
-        ensure
-          project.update_attributes(:building => false)
-          project.send_notifications
-        end
+    def build(commit_identifier)
+      builds.first_or_create(:commit_identifier => commit_identifier).tap do |build|
+        build.update_attributes(:status => "pending", :created_at => Time.now) unless build.pending?
       end
+    end
+    
+    def building?
+      !build_in_progress.nil?
+    end
+    
+    def build_in_progress
+      builds.first(:started_building_at.not => nil, :finished_building_at => nil)
     end
 
     def last_build

@@ -9,9 +9,11 @@ require "dm-types"
 require "dm-timestamps"
 require "dm-aggregates"
 
+require "ostruct"
 require "yaml"
 require "logger"
 require "digest/sha1"
+require "fileutils"
 
 require "core_ext/object"
 require "core_ext/string"

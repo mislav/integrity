@@ -114,64 +114,41 @@ describe Integrity::Project do
     end
   end
 
-  describe 'When building it' do
+  describe "When queueing a build" do
     before(:each) do
       @uri = Addressable::URI.parse('git://github.com/foca/integrity.git')
       @project = Integrity::Project.new(:uri => @uri, :branch  => 'production', :command  => 'rake spec')
-      @builder = mock('Builder', :build => true)
-      Integrity::Builder.stub!(:new).and_return(@builder)
-      Thread.stub!(:new).with(@project).and_yield(@project)
-    end
-    
-    it "should offload the building to a new thread" do
-      Thread.should_receive(:new).with(@project).and_yield(@project)
-      @project.build
+      @build = stub("Build", :pending? => true, :update_attributes => true)
+      @project.builds.stub!(:first_or_create).with(:commit_identifier => '6eba34d94b74fe68b96e35450fadf241113e44fc').and_return(@build)
     end
 
-    it "should not build if it's already building" do
-      @project.stub!(:building?).and_return(true)
-      Integrity::Builder.should_not_receive(:new)
-      @project.build
-    end
-
-    it 'should instantiate a new Builder and pass itself to it' do
-      Integrity::Builder.should_receive(:new).with(@project).and_return(@builder)
-      @project.build
-    end
-
-    it 'should tell the builder to build the head if no commit id is passed' do
-      @builder.should_receive(:build).with("HEAD")
-      @project.build
-    end
-
-    it "should tell the builder to build a specific commit if an id is passed" do
-      @builder.should_receive(:build).with('6eba34d94b74fe68b96e35450fadf241113e44fc')
-      @project.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
-    end
-
-    it "should set 'building?' to true while building" do
-      @builder.should_receive(:build) do
-        @project.should be_building
+    describe "when there isn't a build for that commit identifier" do
+      it "should create a build for the given commit id" do
+        @project.builds.should_receive(:first_or_create).with(:commit_identifier => '6eba34d94b74fe68b96e35450fadf241113e44fc').and_return(@build)
+        @project.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
       end
-      @project.build
-    end
-
-    it "should set 'building?' to false after a build" do
-      @project.build
-      @project.should_not be_building
-    end
-
-    it "should ensure 'building?' is false even if the build raises an exception" do
-      lambda {
-        @builder.stub!(:build).and_raise(RuntimeError)
-        @project.build
-        @project.should_not be_building
-      }.should raise_error(RuntimeError)
+      
+      it "should set the newly created build as pending" do
+        @project.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+        @build.should be_pending
+      end
     end
     
-    it "should deliver the corresponding notifications after building" do
-      @project.should_receive(:send_notifications)
-      @project.build
+    describe "when there's an existing build for that commit identifier" do
+      before do
+        Time.stub!(:now).and_return Time.mktime(2008, 11, 26, 00, 24, 20)
+        @build.stub!(:pending?).and_return(false)
+      end
+      
+      it "should load the build with the given commit id" do
+        @project.builds.should_receive(:first_or_create).with(:commit_identifier => '6eba34d94b74fe68b96e35450fadf241113e44fc').and_return(@build)
+        @project.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
+      end
+      
+      it "should reset the created_at time to 'now' and the status to pending" do
+        @build.should_receive(:update_attributes).with(:status => "pending", :created_at => Time.now)
+        @project.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
+      end
     end
   end
 

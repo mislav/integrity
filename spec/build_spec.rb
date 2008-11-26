@@ -34,17 +34,11 @@ describe Integrity::Build do
     @build.output.should == 'foo'
   end
 
-  it 'should have a status' do
-    @build.successful = true
-    @build.should be_successful
+  it "should have a 'pending' status by default" do
+    @build.should be_pending
   end
 
-  it 'should default to failure' do
-    @build.should be_failed
-    @build.should_not be_successful
-  end
-
-  it 'should have an author' do
+  it "should have an author" do
     @build.commit_metadata = { :author => 'Simon Rozet <simon@rozet.name>' }
     @build.commit_author.name.should == 'Simon Rozet'
     @build.commit_author.email.should == 'simon@rozet.name'
@@ -70,11 +64,22 @@ describe Integrity::Build do
     @build.output.should == ''
   end
 
-  it '#human_readable_status should return "Build successful" or "Build Failed"' do
-    @build.stub!(:successful?).and_return(true)
+  it '#human_readable_status should return "Build successful" or "Build Failed" or "Waiting...", depending on the status' do
+    @build.status = "successful"
     @build.human_readable_status.should == 'Build Successful'
-    @build.stub!(:successful?).and_return(false)
+    @build.status = "failed"
     @build.human_readable_status.should == 'Build Failed'
+    @build.status = "pending"
+    @build.human_readable_status.should == 'Waiting...'
+  end
+
+  it "should be successful, failed or pending depending on the status" do
+    @build.status = "successful"
+    @build.should be_successful
+    @build.status = "failed"
+    @build.should be_failed
+    @build.status = "pending"
+    @build.should be_pending
   end
 
   it 'should return the short version of the commit identifier if it is a sha1' do
@@ -85,12 +90,5 @@ describe Integrity::Build do
   it 'should return the full commit identifier as the short version if it is not a sha1' do
     @build.stub!(:commit_identifier).and_return('234')
     @build.short_commit_identifier.should == '234'
-  end
-
-  it "should return the status as a symbol (for html classes or the like)" do
-    @build.stub!(:successful?).and_return(true)
-    @build.status.should == :success
-    @build.stub!(:successful?).and_return(false)
-    @build.status.should == :failed
   end
 end

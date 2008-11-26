@@ -1,33 +1,46 @@
-require 'ostruct'
-
 module Integrity
   class Build
     include DataMapper::Resource
 
-    property :id,                Integer,  :serial => true
-    property :output,            Text,     :nullable => false, :default => ''
-    property :successful,        Boolean,  :nullable => false, :default => false
-    property :commit_identifier, String,   :nullable => false
-    property :commit_metadata,   Yaml,     :nullable => false, :lazy => false
-    property :created_at,        DateTime
-    property :updated_at,        DateTime
+    property :id,                   Integer,  :serial => true
+    property :output,               Text,     :nullable => false, :default => ""
+    property :successful,           Boolean,  :nullable => false, :default => false
+    property :status,               String,   :nullable => false, :default => "pending"
+    property :commit_identifier,    String,   :nullable => false
+    property :commit_metadata,      Yaml,     :nullable => false, :lazy => false
+    property :committed_at,         DateTime
+    property :created_at,           DateTime
+    property :started_building_at,  DateTime
+    property :finished_building_at, DateTime
 
     belongs_to :project, :class_name => "Integrity::Project"
 
+    def successful?
+      status == "successful"
+    end
+
     def failed?
-      !successful?
+      status == "failed"
+    end
+    
+    def pending?
+      status == "pending"
     end
 
-    def status
-      successful? ? :success : :failed
+    def built?
+      !pending?
     end
-
+    
     def human_readable_status
-      successful? ? 'Build Successful' : 'Build Failed'
+      case status
+        when "successful" then "Build Successful"
+        when "failed"     then "Build Failed"
+        when "pending"    then "Waiting..."
+      end
     end
 
     def short_commit_identifier
-      sha1?(commit_identifier) ? commit_identifier[0..6] : commit_identifier
+      commit_identifier.to_s[0..6]
     end
 
     def commit_author
@@ -47,10 +60,5 @@ module Integrity
         else commit_metadata[:date]
       end
     end
-
-    private
-      def sha1?(string)
-        string =~ /^[a-f0-9]{40}$/
-      end
   end
 end
