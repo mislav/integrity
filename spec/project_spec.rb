@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + "/spec_helper"
 
 describe Integrity::Project do
   include DatabaseSpecHelper
@@ -11,7 +11,7 @@ describe Integrity::Project do
       :permalink => "integrity" }.merge(attributes)
   end
 
-  it 'should not be valid' do
+  it "should not be valid" do
     @project.should_not be_valid
   end
 
@@ -20,19 +20,19 @@ describe Integrity::Project do
     @project.should be_valid
   end
 
-  it 'should have a name' do
-    @project.name = 'Integrity'
-    @project.name.should == 'Integrity'
+  it "should have a name" do
+    @project.name = "Integrity"
+    @project.name.should == "Integrity"
   end
 
-  it 'should validates name uniqueness' do
-    Integrity::Project.create(valid_attributes(:name => 'foobar'))
-    p = Integrity::Project.create(valid_attributes(:name => 'foobar'))
-    p.errors.on(:name).should include('Name is already taken')
+  it "should validates name uniqueness" do
+    Integrity::Project.create(valid_attributes(:name => "foobar"))
+    p = Integrity::Project.create(valid_attributes(:name => "foobar"))
+    p.errors.on(:name).should include("Name is already taken")
   end
 
-  it 'should have a repository URI' do
-    @project.uri = Addressable::URI.parse('git://github.com/foca/integrity.git')
+  it "should have a repository URI" do
+    @project.uri = Addressable::URI.parse("git://github.com/foca/integrity.git")
     @project.uri.should be_an_instance_of(Addressable::URI)
   end
 
@@ -40,25 +40,25 @@ describe Integrity::Project do
     @project.branch.should == "master"
   end
 
-  it 'should have a project branch' do
-    @project.branch = 'development'
-    @project.branch.should == 'development'
+  it "should have a project branch" do
+    @project.branch = "development"
+    @project.branch.should == "development"
   end
 
-  it 'should have a default build command' do
-    @project.command.should == 'rake'
+  it "should have a default build command" do
+    @project.command.should == "rake"
   end
 
-  it 'should have a build command' do
-    @project.command = 'rake spec'
-    @project.command.should == 'rake spec'
+  it "should have a build command" do
+    @project.command = "rake spec"
+    @project.command.should == "rake spec"
   end
 
-  it 'should have a default visibility of public' do
+  it "should have a default visibility of public" do
     @project.should be_public
   end
 
-  it 'should have a visibility' do
+  it "should have a visibility" do
     @project.public = false
     @project.should_not be_public
   end
@@ -116,20 +116,20 @@ describe Integrity::Project do
 
   describe "When queueing a build" do
     before(:each) do
-      @uri = Addressable::URI.parse('git://github.com/foca/integrity.git')
-      @project = Integrity::Project.new(:uri => @uri, :branch  => 'production', :command  => 'rake spec')
+      @uri = Addressable::URI.parse("git://github.com/foca/integrity.git")
+      @project = Integrity::Project.new(:uri => @uri, :branch  => "production", :command  => "rake spec")
       @build = stub("Build", :pending? => true, :update_attributes => true)
-      @project.builds.stub!(:first_or_create).with(:commit_identifier => '6eba34d94b74fe68b96e35450fadf241113e44fc').and_return(@build)
+      @project.builds.stub!(:first_or_create).with(:commit_identifier => "6eba34d94b74fe68b96e35450fadf241113e44fc").and_return(@build)
     end
 
     describe "when there isn't a build for that commit identifier" do
       it "should create a build for the given commit id" do
-        @project.builds.should_receive(:first_or_create).with(:commit_identifier => '6eba34d94b74fe68b96e35450fadf241113e44fc').and_return(@build)
-        @project.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+        @project.builds.should_receive(:first_or_create).with(:commit_identifier => "6eba34d94b74fe68b96e35450fadf241113e44fc").and_return(@build)
+        @project.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
       end
       
       it "should set the newly created build as pending" do
-        @project.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+        @project.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
         @build.should be_pending
       end
     end
@@ -141,7 +141,7 @@ describe Integrity::Project do
       end
       
       it "should load the build with the given commit id" do
-        @project.builds.should_receive(:first_or_create).with(:commit_identifier => '6eba34d94b74fe68b96e35450fadf241113e44fc').and_return(@build)
+        @project.builds.should_receive(:first_or_create).with(:commit_identifier => "6eba34d94b74fe68b96e35450fadf241113e44fc").and_return(@build)
         @project.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
       end
       
@@ -157,7 +157,7 @@ describe Integrity::Project do
       @project.update_attributes(:name => "Integrity", :uri => "git://github.com/foca/integrity.git")
       5.times do
         @project.builds.create(
-          :commit_identifier => 'commit sha1',
+          :commit_identifier => "commit sha1",
           :commit_metadata => {:author => "someguy", :date => "yesterday"},
           :output => "o"
         )
@@ -186,7 +186,7 @@ describe Integrity::Project do
 
   describe "Determining its status" do
     it "should return the status of its last build" do
-      build = mock('build', :status => :success)
+      build = mock("build", :status => :success)
       @project.stub!(:last_build).and_return(build)
       @project.status.should == :success
     end

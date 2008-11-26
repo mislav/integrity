@@ -1,4 +1,4 @@
-require  File.dirname(__FILE__) + '/spec_helper'
+require  File.dirname(__FILE__) + "/spec_helper"
 
 describe Integrity::Builder do
   def mock_project(messages={})
@@ -27,13 +27,13 @@ describe Integrity::Builder do
 
   def mock_scm(messages={})
     @scm ||= mock("scm", {:with_revision => true}.merge(messages)).tap do |scm|
-      scm.stub!(:commit_identifier).with('6eba34d94b74fe68b96e35450fadf241113e44fc').and_return('6eba34d94b74fe68b96e35450fadf241113e44fc')
-      scm.stub!(:commit_metadata).with('6eba34d94b74fe68b96e35450fadf241113e44fc').and_return(
-        :author  => 'Simon Rozet <simon@rozet.name>',
-        :message => 'A commit message',
-        :date    => Time.parse('Mon Jul 21 15:24:34 2008 +0200')
+      scm.stub!(:commit_identifier).with("6eba34d94b74fe68b96e35450fadf241113e44fc").and_return("6eba34d94b74fe68b96e35450fadf241113e44fc")
+      scm.stub!(:commit_metadata).with("6eba34d94b74fe68b96e35450fadf241113e44fc").and_return(
+        :author  => "Simon Rozet <simon@rozet.name>",
+        :message => "A commit message",
+        :date    => Time.parse("Mon Jul 21 15:24:34 2008 +0200")
       )
-      scm.stub!(:working_directory).and_return('/var/integrity/exports/foca-integrity')
+      scm.stub!(:working_directory).and_return("/var/integrity/exports/foca-integrity")
       scm.stub!(:name).and_return("Git")
     end
   end
@@ -44,8 +44,8 @@ describe Integrity::Builder do
     Integrity::SCM.stub!(:working_tree_path).and_return("foca-integrity")
   end
 
-  describe 'When initializing' do
-    it 'should instantiate a new Build model' do
+  describe "When initializing" do
+    it "should instantiate a new Build model" do
       Integrity::SCM.stub!(:new).and_return(mock_scm)
       Integrity::Build.should_receive(:new).and_return(@build)
       Integrity::Builder.new(mock_project)
@@ -84,31 +84,31 @@ describe Integrity::Builder do
     it "should log the build" do
       Integrity.logger.should_receive(:info).
         with("Building 6eba34d94b74fe68b96e35450fadf241113e44fc (master) of Integrity in /var/integrity/exports/foca-integrity-master using Git")
-      @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+      @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
     end
 
     it "should fetch the latest code from the scm and run the build script" do
       mock_scm.should_receive(:with_revision).
-        with('6eba34d94b74fe68b96e35450fadf241113e44fc').and_yield do
+        with("6eba34d94b74fe68b96e35450fadf241113e44fc").and_yield do
           @builder.should_receive(:run_build_script)
       end
-      @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+      @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
     end
 
     it "should assign the head (minus the identifier) of the SCM as the commit metadata in the build" do
-      metadata = mock_scm.commit_metadata('6eba34d94b74fe68b96e35450fadf241113e44fc')
+      metadata = mock_scm.commit_metadata("6eba34d94b74fe68b96e35450fadf241113e44fc")
       mock_build.should_receive(:commit_metadata=).with(metadata)
-      @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+      @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
     end
 
     it "should assign the commit identifier of the SCM's head as the commit identifier in the build" do
-      mock_build.should_receive(:commit_identifier=).with '6eba34d94b74fe68b96e35450fadf241113e44fc'
-      @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+      mock_build.should_receive(:commit_identifier=).with "6eba34d94b74fe68b96e35450fadf241113e44fc"
+      @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
     end
 
     it "should save the build to the database" do
       mock_build.should_receive(:save)
-      @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+      @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
     end
 
     describe "when there's an error" do
@@ -117,22 +117,22 @@ describe Integrity::Builder do
       it "should still save the build" do
         lambda {
           mock_build.should_receive(:save)
-          @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+          @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
         }.should raise_error(RuntimeError)
       end
 
       it "should still save in what commit this happened" do
         lambda {
-          mock_build.should_receive(:commit_identifier=).with('6eba34d94b74fe68b96e35450fadf241113e44fc')
-          @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+          mock_build.should_receive(:commit_identifier=).with("6eba34d94b74fe68b96e35450fadf241113e44fc")
+          @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
         }.should raise_error(RuntimeError)
       end
 
       it "should still save the commit metadata" do
         lambda {
-          metadata = mock_scm.commit_metadata('6eba34d94b74fe68b96e35450fadf241113e44fc')
+          metadata = mock_scm.commit_metadata("6eba34d94b74fe68b96e35450fadf241113e44fc")
           mock_build.should_receive(:commit_metadata=).with(metadata)
-          @builder.build('6eba34d94b74fe68b96e35450fadf241113e44fc')
+          @builder.build("6eba34d94b74fe68b96e35450fadf241113e44fc")
         }.should raise_error(RuntimeError)
       end
     end
