@@ -76,10 +76,13 @@ describe Integrity::Build do
   it "should be successful, failed or pending depending on the status" do
     @build.status = "successful"
     @build.should be_successful
+    @build.should be_built
     @build.status = "failed"
     @build.should be_failed
+    @build.should be_built
     @build.status = "pending"
     @build.should be_pending
+    @build.should_not be_built
   end
 
   it "should return the short version of the commit identifier" do

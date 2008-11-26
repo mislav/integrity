@@ -152,6 +152,32 @@ describe Integrity::Project do
     end
   end
 
+  describe "While building" do
+    before do
+      @project.update_attributes(:name => "Integrity", :uri => "git://github.com/foca/integrity.git")
+      5.times do |i|
+        @project.builds.create(
+          :commit_identifier => "commit #{i} id",
+          :commit_metadata => {:author => "someguy", :date => "yesterday"},
+          :output => "o",
+          :started_building_at => Time.mktime(2008, 11, i + 1, 0, 0, 0),
+          :finished_building_at => Time.mktime(2008, 11, i + 1, 0, 10, 0)
+        )
+      end
+      
+      @build = @project.last_build
+      @build.update_attributes(:finished_building_at => nil)
+    end
+    
+    it "should find the build currently in progress" do
+      @project.build_in_progress.should == @build
+    end
+    
+    it "should be building if there's a build in progress" do
+      @project.should be_building
+    end
+  end
+
   describe "When searching for its builds" do
     before do
       @project.update_attributes(:name => "Integrity", :uri => "git://github.com/foca/integrity.git")
@@ -265,12 +291,12 @@ describe Integrity::Project do
 
     it "should log timeout" do
       @email_notifier.stub!(:notify_of_build).and_raise(Timeout::Error)
-      Integrity.logger.should_receive(:info).with("Email notifier timed out")
+      Integrity.should_receive(:log).with("Email notifier timed out")
       @project.send(:send_notifications)
     end
 
     it "should log notifications it sends" do
-      Integrity.logger.should_receive(:info).with("Notifying of build 7be5d6d using the Email notifier")
+      Integrity.should_receive(:log).with("Notifying of build 7be5d6d using the Email notifier")
       @project.send(:send_notifications)
     end
   end
