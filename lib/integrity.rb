@@ -41,7 +41,8 @@ module Integrity
                     :export_directory => root / "exports",
                     :log              => STDOUT,
                     :base_uri         => "http://localhost:8910",
-                    :use_basic_auth   => false }
+                    :use_basic_auth   => false,
+                    :build_all_commits => true }
   end
 
   def self.config
