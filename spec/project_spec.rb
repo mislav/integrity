@@ -291,11 +291,13 @@ describe Integrity::Project do
 
     it "should log timeout" do
       @email_notifier.stub!(:notify_of_build).and_raise(Timeout::Error)
+      Integrity.should_receive(:log).with("Notifying of build 7be5d6d using the Email notifier")
       Integrity.should_receive(:log).with("Email notifier timed out")
       @project.send(:send_notifications)
     end
 
     it "should log notifications it sends" do
+      @email_notifier.stub!(:notify_of_build)
       Integrity.should_receive(:log).with("Notifying of build 7be5d6d using the Email notifier")
       @project.send(:send_notifications)
     end
