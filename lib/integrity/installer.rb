@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + "/../integrity"
+require "integrity"
 require "thor"
 
 module Integrity

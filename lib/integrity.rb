@@ -1,6 +1,3 @@
-__DIR__ = File.dirname(__FILE__)
-$:.unshift "#{__DIR__}/integrity", *Dir["#{__DIR__}/../vendor/**/lib"].to_a
-
 require "rubygems"
 require "json"
 require "dm-core"
@@ -16,16 +13,16 @@ require "timeout"
 require "ostruct"
 require "fileutils"
 
-require "core_ext/object"
-require "core_ext/string"
-require "core_ext/time"
+require "integrity/core_ext/object"
+require "integrity/core_ext/string"
+require "integrity/core_ext/time"
 
-require "project"
-require "build"
-require "project_builder"
-require "scm"
-require "scm/git"
-require "notifier"
+require "integrity/project"
+require "integrity/build"
+require "integrity/project_builder"
+require "integrity/scm"
+require "integrity/scm/git"
+require "integrity/notifier"
 
 module Integrity
   def self.new(config_file = nil)
@@ -34,7 +31,7 @@ module Integrity
   end
 
   def self.root
-    File.expand_path(File.join(File.dirname(__FILE__), ".."))
+    @root ||= File.expand_path(File.dirname(__FILE__) / "..")
   end
 
   def self.default_configuration
@@ -47,7 +44,7 @@ module Integrity
   end
 
   def self.config
-    @config ||= default_configuration
+    @config ||= default_configuration.dup
   end
 
   def self.config=(file)
@@ -72,3 +69,6 @@ module Integrity
       end
     end
 end
+
+# push vendored libraries to load paths
+$:.unshift *Dir["#{Integrity.root}/vendor/**/lib"].to_a

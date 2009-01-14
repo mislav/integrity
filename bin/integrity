@@ -1,4 +1,13 @@
 #!/usr/bin/env ruby
-require File.dirname(__FILE__) + "/../lib/integrity/installer"
+unless RUBY_PLATFORM =~ /(:?mswin|mingw)/
+  require 'pathname'
+  lib_dir = Pathname.new(__FILE__).realpath.dirname + '../lib'
+else
+  # windows
+  lib_dir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+end
 
+$:.unshift(lib_dir) unless $:.include?(lib_dir)
+
+require 'integrity/installer'
 Integrity::Installer.start

@@ -1,4 +1,3 @@
-require File.dirname(__FILE__) + "/lib/integrity"
 require "rake/testtask"
 require "rcov/rcovtask"
 
@@ -50,19 +49,29 @@ namespace :test do
   end
 end
 
+task :environment do
+  $:.unshift "#{File.dirname(__FILE__)}/lib"
+  require 'integrity'
+end
+
 namespace :db do
   desc "Setup connection."
-  task :connect do
-    config = File.expand_path(ENV['CONFIG']) if ENV['CONFIG']
-    config = Integrity.root / 'config.yml' if File.exists?(Integrity.root / 'config.yml')
+  task :connect => :environment do
+    if ENV['CONFIG']
+      config = File.expand_path(ENV['CONFIG'])
+    elsif config_file = Integrity.root / 'config' / 'config.yml' and File.exists?(config_file)
+      config = config_file
+    else
+      config = nil
+    end
     Integrity.new(config)
   end
 
   desc "Automigrate the database"
   task :migrate => :connect do
-    require "project"
-    require "build"
-    require "notifier"
+    require "integrity/project"
+    require "integrity/build"
+    require "integrity/notifier"
     DataMapper.auto_migrate!
   end
 end
