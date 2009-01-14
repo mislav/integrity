@@ -1,4 +1,5 @@
 log/*.log
+config.ru
 config/thin.yml
 config/deploy.rb
 config/config.yml
