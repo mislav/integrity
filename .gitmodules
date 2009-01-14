@@ -1,3 +1,9 @@
 [submodule "vendor/webrat"]
 	path = vendor/webrat
 	url = git://github.com/foca/webrat.git
+[submodule "vendor/sinatra"]
+	path = vendor/sinatra
+	url = git://github.com/rtomayko/sinatra.git
+[submodule "vendor/sinatra-diddies"]
+	path = vendor/sinatra-diddies
+	url = git://github.com/foca/sinatra-diddies.git

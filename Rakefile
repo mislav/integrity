@@ -80,8 +80,13 @@ end
 
 begin
   require 'jeweler'
+rescue LoadError
+  # you must install jeweler for gem-related tasks
+else
   Jeweler::Tasks.new do |s|
-    files  = `git ls-files`.split("\n").reject {|f| f =~ %r(^test/acceptance) || f =~ %r(^test/unit) || f =~ /^\.git/ } 
+    file_list = FileList.new `git ls-files`.split("\n").reject { |f| f =~ %r{^(\.git|test/)} }
+    file_list.exclude('vendor/webrat')
+    file_list.include('vendor/sinatra/lib/**/*', 'vendor/sinatra-diddies/lib/**/*')
 
     s.name                 = 'integrity'
     s.summary              = 'The easy and fun Continuous Integration server'
@@ -90,11 +95,10 @@ begin
     s.rubyforge_project    = 'integrity'
     s.email                = 'contacto@nicolassanguinetti.info'
     s.authors              = ['Nicolás Sanguinetti', 'Simon Rozet']
-    s.files                = files
+    s.files                = file_list
     s.executables          = ['integrity']
     s.post_install_message = 'Run `integrity help` for information on how to setup Integrity.'
 
-    s.add_dependency 'sinatra', ['>= 0.3.2']
     s.add_dependency 'haml' # ah, you evil monkey you
     s.add_dependency 'dm-core', ['>= 0.9.5']
     s.add_dependency 'dm-validations', ['>= 0.9.5']
@@ -104,10 +108,7 @@ begin
     s.add_dependency 'data_objects', ['>= 0.9.5']
     s.add_dependency 'do_sqlite3', ['>= 0.9.5']        
     s.add_dependency 'json'
-    s.add_dependency 'foca-sinatra-diddies', ['>= 0.0.2']
     s.add_dependency 'thor'
     s.add_dependency 'bcrypt-ruby'
   end
-rescue LoadError
 end
-
