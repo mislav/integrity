@@ -1,7 +1,8 @@
-require File.dirname(__FILE__) + "/../lib/integrity"
+require "integrity"
 
 require "test/unit"
-require "redgreen"
+require "rubygems"
+begin; require "redgreen"; rescue LoadError; end
 require "context"
 require "storyteller"
 require "pending"

@@ -9,10 +9,12 @@ task :test => %w(test:units test:acceptance)
 
 namespace :test do
   Rake::TestTask.new(:units) do |t|
+    t.libs = ['lib']
     t.test_files = FileList["test/unit/*_test.rb"]
   end
 
   Rake::TestTask.new(:acceptance) do |t|
+    t.libs = ['lib']
     t.test_files = FileList["test/acceptance/*_test.rb"]
   end
   
