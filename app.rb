@@ -1,7 +1,8 @@
 require "integrity"
 require "integrity/helpers"
 require "sinatra"
-# require "hacks"
+require "rack/contrib"
+use Rack::NestedParams
 
 set :root,   Integrity.root
 set :public, Integrity.root / "public"
@@ -59,7 +60,7 @@ end
 post "/" do
   login_required
   
-  @project = Project.new(params[:project_data])
+  @project = Project.new(params['project_data'])
   if @project.save
     @project.enable_notifiers(params["enabled_notifiers[]"], params["notifiers"])
     redirect project_path(@project)
@@ -82,7 +83,7 @@ end
 put "/:project" do
   login_required
   
-  if current_project.update_attributes(params[:project_data])
+  if current_project.update_attributes(params['project_data'])
     current_project.enable_notifiers(params["enabled_notifiers[]"], params["notifiers"])
     redirect project_url(current_project)
   else
@@ -109,7 +110,7 @@ post "/:project/push" do
   content_type "text/plain"
 
   begin
-    current_project.push(params[:payload])
+    current_project.push(params['payload'])
     "Thanks, build started."
   rescue JSON::ParserError => exception
     invalid_payload!(exception.to_s)
