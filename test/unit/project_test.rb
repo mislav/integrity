@@ -284,7 +284,7 @@ class ProjectTest < Test::Unit::TestCase
       @project.update_attributes(:notifiers => [irc, twitter])
 
       mock.proxy(Integrity::Notifier::Twitter).notify_of_build(@project.last_build, anything) do
-        raise Timeout::Error
+        raise Timeout::Error, "I've timed out, boo"
       end
       mock.proxy(Integrity::Notifier::IRC).notify_of_build(@project.last_build, anything)
 
