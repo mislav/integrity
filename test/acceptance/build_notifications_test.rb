@@ -8,10 +8,6 @@ class BuildNotificationsTest < Test::Unit::AcceptanceTestCase
     So that I get alerts with every build
   EOS
   
-  before(:each) do
-    Integrity.config[:base_uri] = "http://integrity.example.org"
-  end
-
   scenario "an admin sets up a notifier for a project that didn't have any" do
     git_repo(:my_test_project).add_successful_commit
     Project.gen(:my_test_project, :notifiers => [], :uri => git_repo(:my_test_project).path)

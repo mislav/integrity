@@ -9,6 +9,8 @@ Webrat.configuration.instance_variable_set("@mode", :sinatra)
 
 module Webrat
   class SinatraSession < Session
+    DEFAULT_DOMAIN = "integrity.example.org"
+    
     def initialize(context = nil)
       super(context)
       @sinatra_test = Sinatra::TestHarness.new
@@ -26,10 +28,6 @@ module Webrat
       METHOD
     end
     
-    def response
-      @sinatra_test.response
-    end
-    
     def response_body
       @sinatra_test.body
     end
@@ -37,11 +35,27 @@ module Webrat
     def response_code
       @sinatra_test.status
     end
+    
+    private
+    
+    def response
+      @sinatra_test.response
+    end
+    
+    def current_host
+      URI.parse(current_url).host || DEFAULT_DOMAIN
+    end
+    
+    def response_location_host
+      URI.parse(response_location).host || DEFAULT_DOMAIN
+    end
   end
 end
 
 require Integrity.root / "app"
 require File.dirname(__FILE__) / "acceptance/git_helper"
+
+Integrity.config[:base_uri] = "http://#{Webrat::SinatraSession::DEFAULT_DOMAIN}"
 
 module AcceptanceHelper
   include FileUtils
