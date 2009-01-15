@@ -62,6 +62,22 @@ class EditProjectTest < Test::Unit::AcceptanceTestCase
     response_body.should have_tag("a", /My Test Project/)
   end
   
+  scenario "public projects have a ticked 'public' checkbox on edit form" do
+    Project.generate(:my_test_project, :public => true)
+    disable_auth!
+    visit "/my-test-project/edit"
+    
+    response_body.should have_tag('input[@type="checkbox"][@checked="checked"][@name="project_data[public]"]')
+  end
+  
+  scenario "private projects have an unticked 'public' checkbox on edit form" do
+    Project.generate(:my_test_project, :public => false)
+    disable_auth!
+    visit "/my-test-project/edit"
+    
+    response_body.should_not have_tag('input[@type="checkbox"][@checked][@name="project_data[public]"]')
+  end
+  
   scenario "a user can't edit a project's information" do
     Project.generate(:integrity)
     
