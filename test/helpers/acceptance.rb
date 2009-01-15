@@ -23,6 +23,7 @@ module Webrat
             data[key] = Rack::Utils.unescape(value)
             data
           end
+          headers['HTTP_HOST'] = DEFAULT_DOMAIN
           @sinatra_test.#{verb}(path, params, headers)
         end
       METHOD
@@ -54,8 +55,6 @@ end
 
 require Integrity.root / "app"
 require File.dirname(__FILE__) / "acceptance/git_helper"
-
-Integrity.config[:base_uri] = "http://#{Webrat::SinatraSession::DEFAULT_DOMAIN}"
 
 module AcceptanceHelper
   include FileUtils

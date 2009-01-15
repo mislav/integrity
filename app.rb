@@ -58,7 +58,7 @@ end
 get "/login" do
   login_required
   session[:user] = current_user
-  redirect "/"
+  redirect root_url
 end
 
 get "/new" do
@@ -74,7 +74,7 @@ post "/" do
   @project = Project.new(params['project_data'])
   if @project.save
     @project.enable_notifiers(params["enabled_notifiers[]"], params["notifiers"])
-    redirect project_path(@project)
+    redirect project_url(@project)
   else
     show :new, :title => ["projects", "new project"]
   end
@@ -106,7 +106,7 @@ delete "/:project" do
   login_required
 
   current_project.destroy
-  redirect "/"
+  redirect root_url
 end
 
 get "/:project/edit" do
