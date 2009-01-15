@@ -86,7 +86,7 @@ get "/:project" do
 end
 
 get "/:project.rss" do
-  header "Content-Type" => "application/rss+xml; charset=utf-8"
+  response.headers["Content-Type"] = "application/rss+xml; charset=utf-8"
   login_required unless current_project.public? 
   builder :project
 end
@@ -141,7 +141,7 @@ get "/:project/builds/:build" do
 end
 
 get "/integrity.css" do
-  header "Content-Type" => "text/css; charset=utf-8"
+  response.headers["Content-Type"] = "text/css; charset=utf-8"
   sass :integrity
 end
 
