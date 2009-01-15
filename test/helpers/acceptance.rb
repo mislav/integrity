@@ -5,27 +5,43 @@ require 'sinatra/test'
 disable :run
 disable :reload
 
+Webrat.configuration.instance_variable_set("@mode", :sinatra)
+
 module Webrat
-  class SinatraSession < RackSession
-    include Sinatra::Test
-    
-    attr_reader :response
+  class SinatraSession < Session
+    def initialize(context = nil)
+      super(context)
+      @sinatra_test = Sinatra::TestHarness.new
+    end
 
     %w(get head post put delete).each do |verb|
-      define_method(verb) do |*args| # (path, data, headers = nil)
-        path, data, headers = *args
-        data = data.inject({}) {|data, (key,value)| data[key] = Rack::Utils.unescape(value); data }
-        params = data.merge(:env => headers || {})
-        self.__send__("#{verb}_it", path, params)
-      end
+      class_eval <<-METHOD
+        def #{verb}(path, data, headers = {})
+          params = data.inject({}) do |data, (key,value)|
+            data[key] = Rack::Utils.unescape(value)
+            data
+          end
+          @sinatra_test.#{verb}(path, params, headers)
+        end
+      METHOD
+    end
+    
+    def response
+      @sinatra_test.response
+    end
+    
+    def response_body
+      @sinatra_test.body
+    end
+    
+    def response_code
+      @sinatra_test.status
     end
   end
 end
 
 require Integrity.root / "app"
 require File.dirname(__FILE__) / "acceptance/git_helper"
-
-Webrat.configuration.instance_variable_set("@mode", :sinatra)
 
 module AcceptanceHelper
   include FileUtils
@@ -45,7 +61,7 @@ module AcceptanceHelper
     def AcceptanceHelper.logged_in; true; end
     basic_auth user, password
     visit "/login"
-    Sinatra.application.before { login_required if AcceptanceHelper.logged_in }
+    Sinatra::Application.before { login_required if AcceptanceHelper.logged_in }
   end
   
   def log_out
@@ -70,16 +86,12 @@ module AcceptanceHelper
   end
 end
 
-module WebratHelpers
-  include Webrat::Methods
-  Webrat::Methods.delegate_to_session :response_code, :response_body
-end
-
 class Test::Unit::AcceptanceTestCase < Test::Unit::TestCase
   include AcceptanceHelper
   include Test::Storyteller
-  include WebratHelpers
   include GitHelper
+  include Webrat::Methods
+  Webrat::Methods.delegate_to_session :response_code
   
   before(:each) do
     # ensure each scenario is run in a clean sandbox
