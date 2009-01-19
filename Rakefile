@@ -93,7 +93,6 @@ else
     file_list = FileList.new `git ls-files`.split("\n").reject { |f| f =~ %r{^(\.git|test/)} }
     file_list.exclude('vendor/webrat')
     file_list.include('vendor/sinatra/lib/**/*', 'vendor/sinatra-diddies/lib/**/*')
-    file_list.include('vendor/rack-contrib/lib/**/*')
 
     s.name                 = 'integrity'
     s.summary              = 'The easy and fun Continuous Integration server'

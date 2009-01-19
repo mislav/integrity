@@ -2,19 +2,6 @@ require "integrity"
 require "integrity/helpers"
 require "sinatra"
 
-require "rack/contrib"
-use Rack::NestedParams
-
-Sinatra::Request.class_eval do
-  # override Rack method because the original one
-  # ignores params in bodies of PUT requests (?!)
-  def params
-    self.GET.update(self.POST)
-  rescue EOFError => e
-    self.GET
-  end
-end
-
 set :root,   Integrity.root
 set :public, Integrity.root / "public"
 set :views,  Integrity.root / "views"

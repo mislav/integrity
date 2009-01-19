@@ -7,6 +7,3 @@
 [submodule "vendor/sinatra-diddies"]
 	path = vendor/sinatra-diddies
 	url = git://github.com/foca/sinatra-diddies.git
-[submodule "vendor/rack-contrib"]
-	path = vendor/rack-contrib
-	url = git://github.com/mislav/rack-contrib.git
