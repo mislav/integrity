@@ -1,15 +1,25 @@
 require "integrity"
 
-require "test/unit"
-require "rubygems"
-begin; require "redgreen"; rescue LoadError; end
-require "context"
-require "storyteller"
-require "pending"
-require "matchy"
-require "rr"
-require "mocha"
-require "ruby-debug"
+begin
+  require "test/unit"
+  require "redgreen"
+  require "context"
+  require "storyteller"
+  require "pending"
+  require "matchy"
+  require "rr"
+  require "mocha"
+  require "ruby-debug"
+rescue LoadError
+  puts "You're missing some gems required to run the tests."
+  puts "Please run `rake test:install_dependencies`"
+  puts "You'll probably need to run that command as root or with sudo."
+  puts 
+  puts "Thanks :)"
+  puts
+  
+  exit 1
+end
 
 require File.dirname(__FILE__) / "helpers" / "expectations"
 require File.dirname(__FILE__) / "helpers" / "fixtures"
@@ -20,7 +30,7 @@ module TestHelper
     DataMapper.setup(:default, "sqlite3::memory:")
     DataMapper.auto_migrate!
   end
-  
+
   def ignore_logs!
     stub(Integrity).log { nil }
   end

@@ -37,7 +37,7 @@ module Integrity
       update_attributes(:building => false)
       send_notifications
     end
-    
+
     def push(payload)
       payload = JSON.parse(payload || "")
 
@@ -68,20 +68,20 @@ module Integrity
         else !!flag
       end)
     end
-    
+
     def config_for(notifier)
       notifier = notifiers.first(:name => notifier.to_s.split(/::/).last)
       notifier.blank? ? {} : notifier.config
     end
-    
+
     def notifies?(notifier)
       !notifiers.first(:name => notifier.to_s.split(/::/).last).blank?
     end
-    
+
     def enable_notifiers(*args)
       Notifier.enable_notifiers(id, *args)
     end
-    
+
     private
       def set_permalink
         self.permalink = (name || "").downcase.
@@ -94,8 +94,10 @@ module Integrity
       def delete_code
         builds.destroy!
         ProjectBuilder.new(self).delete_code
+      rescue SCM::SCMUnknownError => error
+        Integrity.log "Problem while trying to deleting code: #{error}"
       end
-      
+
       def send_notifications
         notifiers.each do |notifier|
           begin
@@ -107,7 +109,7 @@ module Integrity
           end
         end
       end
-      
+
       def all_builds
         builds.all.sort_by {|b| b.commited_at }.reverse
       end

@@ -141,15 +141,30 @@ module Integrity
       elsif date_time.day == today.day - 1 && date_time.month == today.month && date_time.year == today.year
         "yesterday"
       else
-        date_time.strftime("on %b %d%o")
+        strftime_with_ordinal(date_time, "on %b %d%o")
       end
     end
 
+    def strftime_with_ordinal(date_time, format_string)
+      ordinal = case date_time.day
+        when 1, 21, 31 then "st"
+        when 2, 22     then "nd"
+        when 3, 23     then "rd"
+        else                "th"
+      end
+
+      date_time.strftime(format_string.gsub("%o", ordinal))
+    end
+
+    def partial(template, locals={})
+      haml("_#{template}".to_sym, :locals => locals, :layout => false)
+    end
+
     def notifier_form(notifier)
-      haml(notifier.to_haml, :layout => :notifier, :locals => { 
-        :config => current_project.config_for(notifier), 
-        :notifier => "#{notifier.to_s.split(/::/).last}", 
-        :enabled => current_project.notifies?(notifier) 
+      haml(notifier.to_haml, :layout => :notifier, :locals => {
+        :config => current_project.config_for(notifier),
+        :notifier => "#{notifier.to_s.split(/::/).last}",
+        :enabled => current_project.notifies?(notifier)
       })
     end
   end

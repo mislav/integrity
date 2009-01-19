@@ -75,16 +75,11 @@ class ProjectBuilderTest < Test::Unit::TestCase
     end
 
     it "captures both stdout and stderr" do
-      @project.update_attributes(:command => "echo foo && cat /no/such/file.txt")
+      @project.update_attributes(:command => "echo foo through out && echo bar through err 1>&2")
       SCM::Git.any_instance.expects(:with_revision).with("HEAD").yields
 
       build = ProjectBuilder.new(@project).build("HEAD")
-      build.output.should == "foo\ncat: /no/such/file.txt: No such file or directory\n"
-    end
-
-    it "raises SCMUnknownError if it can't figure the scm from the uri" do
-      @project.update_attributes(:uri => "scm://example.org")
-      lambda { @project.build }.should raise_error(SCM::SCMUnknownError)
+      build.output.should == "foo through out\nbar through err\n"
     end
   end
 

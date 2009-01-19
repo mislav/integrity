@@ -82,12 +82,12 @@ end
 
 get "/:project" do
   login_required unless current_project.public?
-  show :project, :title => ["projects", current_project.permalink]
+  show :project, :title => ["projects", current_project.name]
 end
 
-get "/:project.rss" do
-  response.headers["Content-Type"] = "application/rss+xml; charset=utf-8"
-  login_required unless current_project.public? 
+get "/:project.atom" do
+  login_required unless current_project.public?
+  response.headers["Content-Type"] = "application/atom+xml; charset=utf-8"
   builder :project
 end
 
@@ -117,7 +117,7 @@ end
 
 post "/:project/push" do
   login_required
-  
+
   content_type "text/plain"
 
   begin

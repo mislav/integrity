@@ -15,7 +15,6 @@ require "fileutils"
 
 require "integrity/core_ext/object"
 require "integrity/core_ext/string"
-require "integrity/core_ext/time"
 
 require "integrity/project"
 require "integrity/build"
@@ -27,6 +26,7 @@ require "integrity/notifier"
 module Integrity
   def self.new(config_file = nil)
     self.config = config_file unless config_file.nil?
+    DataMapper.logger = self.logger
     DataMapper.setup(:default, config[:database_uri])
   end
 
@@ -50,7 +50,7 @@ module Integrity
   def self.config=(file)
     @config = default_configuration.merge(YAML.load_file(file))
   end
-  
+
   def self.log(message, &block)
     logger.info(message, &block)
   end
@@ -60,9 +60,16 @@ module Integrity
       logger.formatter = LogFormatter.new
     end
   end
-  
+
+  def self.version
+    @version ||= begin
+      file = YAML.load_file(Integrity.root / "VERSION.yml")
+      "#{file['major']}.#{file['minor']}.#{file['patch']}"
+    end
+  end
+
   private
-  
+
     class LogFormatter < Logger::Formatter
       def call(severity, time, progname, msg)
         time.strftime("[%H:%M:%S] ") + msg2str(msg) + "\n"

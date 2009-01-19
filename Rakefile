@@ -17,10 +17,10 @@ namespace :test do
     t.libs = ['lib']
     t.test_files = FileList["test/acceptance/*_test.rb"]
   end
-  
+
   desc "Measure test coverage"
   task :coverage => %w(test:coverage:units test:coverage:acceptance)
-  
+
   namespace :coverage do
     desc "Measure test coverage of unit tests"
     Rcov::RcovTask.new(:units) do |rcov|
@@ -28,19 +28,19 @@ namespace :test do
       rcov.rcov_opts = %w(--html --aggregate .aggregated_coverage_report)
       rcov.rcov_opts << ENV["RCOV_OPTS"] if ENV["RCOV_OPTS"]
     end
-    
+
     desc "Measure test coverage of acceptance tests"
     Rcov::RcovTask.new(:acceptance) do |rcov|
       rcov.pattern   = "test/acceptance/*_test.rb"
       rcov.rcov_opts = %w(--html --aggregate .aggregated_coverage_report)
       rcov.rcov_opts << ENV["RCOV_OPTS"] if ENV["RCOV_OPTS"]
     end
-    
+
     desc "Verify test coverage"
     task :verify => "test:coverage" do
       File.read("coverage/index.html") =~ /<tt class='coverage_total'>\s*(\d+\.\d+)%\s*<\/tt>/
       coverage = $1.to_f
-      
+
       puts
       if coverage == 100
         puts "\e[32m100% coverage! Awesome!\e[0m"
@@ -48,6 +48,12 @@ namespace :test do
         puts "\e[31mOnly #{coverage}% code coverage. You can do better ;)\e[0m"
       end
     end
+  end
+
+  desc "Install all gems on which the tests depend on"
+  task :install_dependencies do
+    system 'gem install redgreen rr mocha ruby-debug dm-sweatshop'
+    system 'gem install -s http://gems.github.com jeremymcanally-context jeremymcanally-matchy jeremymcanally-pending foca-storyteller'
   end
 end
 
@@ -106,8 +112,9 @@ else
     s.add_dependency 'dm-types', ['>= 0.9.5']
     s.add_dependency 'dm-timestamps', ['>= 0.9.5']
     s.add_dependency 'dm-aggregates', ['>= 0.9.5']
+    s.add_dependency 'dm-migrations', ['>= 0.9.5']
     s.add_dependency 'data_objects', ['>= 0.9.5']
-    s.add_dependency 'do_sqlite3', ['>= 0.9.5']        
+    s.add_dependency 'do_sqlite3', ['>= 0.9.5']
     s.add_dependency 'json'
     s.add_dependency 'thor'
     s.add_dependency 'bcrypt-ruby'
