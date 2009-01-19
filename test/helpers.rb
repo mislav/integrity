@@ -1,17 +1,16 @@
 require "integrity"
 
-begin
-  require "test/unit"
-  require "redgreen"
-  require "context"
-  require "storyteller"
-  require "pending"
-  require "matchy"
-  require "rr"
-  require "mocha"
-  require "ruby-debug"
-rescue LoadError
-  puts "You're missing some gems required to run the tests."
+missing = []
+%w[test/unit redgreen context storyteller pending matchy rr mocha ruby-debug].each do |lib|
+  begin
+    require lib
+  rescue LoadError
+    missing << lib
+  end
+end
+
+unless missing.empty? or missing == ['redgreen']
+  puts "You're missing some gems required to run the tests: #{missing.join(', ')}"
   puts "Please run `rake test:install_dependencies`"
   puts "You'll probably need to run that command as root or with sudo."
   puts 
