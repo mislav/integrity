@@ -7,3 +7,6 @@
 [submodule "vendor/sinatra-diddies"]
 	path = vendor/sinatra-diddies
 	url = git://github.com/foca/sinatra-diddies.git
+[submodule "vendor/integrity-email"]
+	path = vendor/integrity-email
+	url = git://github.com/foca/integrity-email.git
