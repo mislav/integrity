@@ -13,16 +13,15 @@ unless missing.empty? or missing == ['redgreen']
   puts "You're missing some gems required to run the tests: #{missing.join(', ')}"
   puts "Please run `rake test:install_dependencies`"
   puts "You'll probably need to run that command as root or with sudo."
-  puts 
+  puts
   puts "Thanks :)"
   puts
-  
+
   exit 1
 end
 
 require File.dirname(__FILE__) / "helpers" / "expectations"
 require File.dirname(__FILE__) / "helpers" / "fixtures"
-require File.dirname(__FILE__) / "helpers" / "acceptance"
 
 module TestHelper
   def setup_and_reset_database!

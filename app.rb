@@ -1,6 +1,7 @@
+require "sinatra"
+
 require "integrity"
 require "integrity/helpers"
-require "sinatra"
 
 set :root,   Integrity.root
 set :public, Integrity.root / "public"

@@ -92,7 +92,8 @@ else
   Jeweler::Tasks.new do |s|
     file_list = FileList.new `git ls-files`.split("\n").reject { |f| f =~ %r{^(\.git|test/)} }
     file_list.exclude('vendor/webrat')
-    file_list.include('vendor/sinatra/lib/**/*', 'vendor/sinatra-diddies/lib/**/*')
+    file_list.exclude('vendor/sinatra')
+    file_list.include('vendor/sinatra-ditties/lib/**/*')
     file_list.include('vendor/integrity-email/lib/**/*')
 
     s.name                 = 'integrity'
@@ -107,7 +108,7 @@ else
     s.post_install_message = 'Run `integrity help` for information on how to setup Integrity.'
 
     s.add_dependency 'sinatra', ['>= 0.9.0.3']
-    s.add_dependency 'haml' # ah, you evil monkey you
+    s.add_dependency 'haml',    ['>= 2.0.0']
     s.add_dependency 'dm-core', ['>= 0.9.5']
     s.add_dependency 'dm-validations', ['>= 0.9.5']
     s.add_dependency 'dm-types', ['>= 0.9.5']
