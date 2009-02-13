@@ -91,8 +91,6 @@ rescue LoadError
 else
   Jeweler::Tasks.new do |s|
     file_list = FileList.new `git ls-files`.split("\n").reject { |f| f =~ %r{^(\.git|test/)} }
-    file_list.exclude('vendor/webrat')
-    file_list.exclude('vendor/sinatra')
     file_list.include('vendor/sinatra-ditties/lib/**/*')
     file_list.include('vendor/integrity-email/lib/**/*')
 

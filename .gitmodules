@@ -1,9 +1,6 @@
-[submodule "vendor/sinatra"]
-	path = vendor/sinatra
-	url = git://github.com/rtomayko/sinatra.git
-[submodule "vendor/sinatra-diddies"]
-	path = vendor/sinatra-diddies
-	url = git://github.com/foca/sinatra-diddies.git
 [submodule "vendor/integrity-email"]
 	path = vendor/integrity-email
 	url = git://github.com/foca/integrity-email.git
+[submodule "vendor/sinatra-ditties"]
+	path = vendor/sinatra-ditties
+	url = git://github.com/foca/sinatra-ditties.git
