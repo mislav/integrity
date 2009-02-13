@@ -10,7 +10,7 @@ Webrat.configuration.instance_variable_set("@mode", :sinatra)
 module Webrat
   class SinatraSession < Session
     DEFAULT_DOMAIN = "integrity.example.org"
-    
+
     def initialize(context = nil)
       super(context)
       @sinatra_test = Sinatra::TestHarness.new
@@ -28,25 +28,25 @@ module Webrat
         end
       METHOD
     end
-    
+
     def response_body
       @sinatra_test.body
     end
-    
+
     def response_code
       @sinatra_test.status
     end
-    
+
     private
-    
+
     def response
       @sinatra_test.response
     end
-    
+
     def current_host
       URI.parse(current_url).host || DEFAULT_DOMAIN
     end
-    
+
     def response_location_host
       URI.parse(response_location).host || DEFAULT_DOMAIN
     end
@@ -69,14 +69,14 @@ module AcceptanceHelper
     Integrity.config[:admin_password]      = "test"
     Integrity.config[:hash_admin_password] = false
   end
-  
+
   def login_as(user, password)
     def AcceptanceHelper.logged_in; true; end
     basic_auth user, password
     visit "/login"
     Sinatra::Application.before { login_required if AcceptanceHelper.logged_in }
   end
-  
+
   def log_out
     def AcceptanceHelper.logged_in; false; end
     @_webrat_session = Webrat::SinatraSession.new(self)
@@ -105,7 +105,11 @@ class Test::Unit::AcceptanceTestCase < Test::Unit::TestCase
   include GitHelper
   include Webrat::Methods
   Webrat::Methods.delegate_to_session :response_code
-  
+
+  before(:all) do
+    Integrity.config[:base_uri] = "http://#{Webrat::SinatraSession::DEFAULT_DOMAIN}"
+  end
+
   before(:each) do
     # ensure each scenario is run in a clean sandbox
     setup_and_reset_database!
@@ -114,7 +118,7 @@ class Test::Unit::AcceptanceTestCase < Test::Unit::TestCase
     set_and_create_export_directory!
     log_out
   end
-  
+
   after(:each) do
     destroy_all_git_repos
     rm_r export_directory if File.directory?(export_directory)
