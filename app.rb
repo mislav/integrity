@@ -111,7 +111,7 @@ post "/:project/push" do
     current_project.push(params['payload'])
     "Thanks, build started."
   rescue JSON::ParserError => exception
-    invalid_payload!(exception.to_s)
+    throw :halt, [422, exception.to_s]
   end
 end
 
@@ -133,5 +133,5 @@ get "/integrity.css" do
 end
 
 helpers do
-  include Integrity::Helpers
+  include Helpers
 end

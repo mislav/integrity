@@ -1,7 +1,15 @@
-require "diddies"
+Dir["#{File.dirname(__FILE__)}/helpers/*.rb"].each &method(:require)
 
 module Integrity
-  module Helpers
+  module Helpers  
+    include Authorization
+    include Breadcrumbs
+    include Forms
+    include PrettyOutput
+    include Rendering
+    include Resources
+    include Urls
+    
     include Rack::Utils
     include Sinatra::Authorization
     alias_method :h, :escape_html
